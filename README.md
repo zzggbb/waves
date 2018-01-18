@@ -1,6 +1,8 @@
 # W A V E S
 An FFT based Audio Visualizer
 
+![purple.png](images/purple.png)
+
 ### Getting Started
 
 ```

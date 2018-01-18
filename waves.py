@@ -23,7 +23,7 @@ CHANNELS = 1
 SURFACE_SIZE = (SURFACE_WIDTH, SURFACE_HEIGHT) = (1920, 1080)
 BACKGROUND_COLOR = pygame.Color('white')
 color1 = pygame.Color('red')
-color2 = pygame.Color('black')
+color2 = pygame.Color('blue')
 SMOOTHING = 0.6
 GAIN = 0.5
 
@@ -61,11 +61,11 @@ def processEvents():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_h:
                 stream.sample_size //= 2
-                numpy.resize(LAST_POWER, stream.sample_size)
+                LAST_POWER.resize(stream.sample_size)
 
             if event.key == pygame.K_l:
                 stream.sample_size *= 2
-                numpy.resize(LAST_POWER, stream.sample_size)
+                LAST_POWER.resize(stream.sample_size)
 
             if event.key == pygame.K_j:
                 stream.sample_rate -= 2500
