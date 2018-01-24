@@ -1,9 +1,7 @@
 #!/bin/env python3
-
 import sys
 import time
 import struct
-from multiprocessing import Process
 
 import numpy
 import pygame
@@ -11,87 +9,134 @@ import pyaudio
 
 from stream import Stream
 from controls import Controls
-import utility
+import util
 
-# audio parameters
-SAMPLE_WIDTH = 16
-SAMPLE_RATE = 20 * 10**3
-SAMPLE_SIZE = 960
-CHANNELS = 1
+class Waves(object):
+    def __init__(self):
+        pygame.init()
 
-# visual parameters
-SURFACE_SIZE = (SURFACE_WIDTH, SURFACE_HEIGHT) = (1920, 1080)
-BACKGROUND_COLOR = pygame.Color('white')
-color1 = pygame.Color('red')
-color2 = pygame.Color('blue')
-SMOOTHING = 0.6
-GAIN = 0.5
+        # surface params
+        self.size = (self.width, self.height) = (960, 1080)
+        self.surface_flags = pygame.HWSURFACE | pygame.DOUBLEBUF
+        self.surface = pygame.display.set_mode(self.size, self.surface_flags)
+        self.time_surface = pygame.Surface((self.width, self.height // 2))
+        self.freq_surface = pygame.Surface((self.width, self.height // 2))
 
-SURFACE = pygame.display.set_mode(SURFACE_SIZE, pygame.HWSURFACE | pygame.DOUBLEBUF)
-CLOCK = pygame.time.Clock()
-LAST_POWER = numpy.full(SAMPLE_SIZE, 0.5)
+        # visual params
+        self.background_color = pygame.Color(255, 255, 255)
+        self.colorA = pygame.Color(255, 0, 0)
+        self.colorB = pygame.Color(0, 0, 255)
+        self.smooth = 0.5
+        self.gain = 0.5
 
-stream = Stream(CHANNELS, SAMPLE_RATE, SAMPLE_SIZE)
-controls = Controls(SURFACE)
+        self.stream = Stream(channels=1,
+                             sample_rate=20 * 10**3,
+                             sample_size=960)
+        self.stream.open()
+        self.controls = Controls(self.surface)
 
-def draw_bars(bytes, sample_rate, sample_size, smoothing, gain):
-    # little endian, signed SAMPLE_WIDTH bit ints
-    format = '<{}h'.format(sample_size)
-    samples = struct.unpack(format, bytes)
+        # smoothing history arrays
+        self.last_t_power = numpy.full(self.stream.sample_size, 0.5)
+        self.last_f_power = numpy.full(self.stream.sample_size // 2, 0.0)
 
-    for i in range(sample_size):
-        power_instant = utility.normalize(samples[i], SAMPLE_WIDTH)
-        LAST_POWER[i] = LAST_POWER[i] * smoothing + power_instant * (1 - smoothing)
+    def get_samples(self):
+        format = '<{}h'.format(self.stream.sample_size)
+        byte_string = self.stream.read(self.stream.sample_size)
+        return struct.unpack(format, byte_string)
 
-        power = utility.gain(gain, LAST_POWER[i])
+    def draw_time_bars(self, samples, surface):
+        width, height = surface.get_size()
+        bar_width = width / self.stream.sample_size
 
-        # determine column position
-        width = SURFACE_WIDTH / sample_size
-        height = power * SURFACE_HEIGHT
-        top = SURFACE_HEIGHT - height
-        left = i * width
-        rect = (left, top, width, height)
+        for i in range(self.stream.sample_size):
+            # current power
+            power_i = util.normalize(samples[i])
+            # smooth between current and last power
+            power_s = self.last_t_power[i]*self.smooth + power_i*(1-self.smooth)
+            # finally, smoothed and gain adjusted
+            power = self.last_t_power[i] = util.gain(power_s, self.gain)
 
-        color = utility.gradient(power, color1, color2)
-        pygame.draw.rect(SURFACE, color, rect)
+            bar_height = power * height
+            top = height - bar_height
+            left = i * bar_width
+            rect = (left, top, bar_width, bar_height)
 
-def processEvents():
-    global GAIN
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_h:
-                stream.sample_size //= 2
-                LAST_POWER.resize(stream.sample_size)
+            color = util.gradient(power, self.colorA, self.colorB)
+            pygame.draw.rect(surface, color, rect)
 
-            if event.key == pygame.K_l:
-                stream.sample_size *= 2
-                LAST_POWER.resize(stream.sample_size)
+    def draw_freq_bars(self, samples, surface):
+        length = self.stream.sample_size // 2
 
-            if event.key == pygame.K_j:
-                stream.sample_rate -= 2500
+        width, height = surface.get_size()
+        bar_width = width / length
 
-            if event.key == pygame.K_k:
-                stream.sample_rate += 2500
+        normalized = list(map(util.normalize, samples))
 
-            if event.key == pygame.K_w:
-                GAIN += 0.01
+        yf = numpy.abs(numpy.fft.fft(normalized)[1:length])
+        yf *= (2.0 / numpy.sqrt(self.stream.sample_size))
 
-            if event.key == pygame.K_s:
-                GAIN -= 0.01
+        for i in range(length - 1):
+            bar_height = yf[i] * height
+            top = height - bar_height
+            left = i * bar_width
+            rect = (left, top, bar_width, bar_height)
+            pygame.draw.rect(surface, self.colorA, rect)
+
+    def process_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.stream.close()
+                pygame.display.quit()
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_h:
+                    self.stream.sample_size //= 2
+                    self.last_t_power.resize(self.stream.sample_size)
+                    self.last_f_power.resize(self.stream.sample_size // 2)
+
+                if event.key == pygame.K_l:
+                    self.stream.sample_size *= 2
+                    self.last_t_power.resize(self.stream.sample_size)
+                    self.last_f_power.resize(self.stream.sample_size // 2)
+
+                if event.key == pygame.K_j:
+                    self.stream.sample_rate -= 2500
+
+                if event.key == pygame.K_k:
+                    self.stream.sample_rate += 2500
+
+                if event.key == pygame.K_t:
+                    self.gain += 0.01
+
+                if event.key == pygame.K_g:
+                    self.gain -= 0.01
+
+    def loop(self):
+        self.process_events()
+
+        for surface in self.time_surface, self.freq_surface:
+            surface.fill(self.background_color)
+
+        samples = self.get_samples()
+
+        self.draw_time_bars(samples, self.time_surface)
+        self.draw_freq_bars(samples, self.freq_surface)
+
+        self.surface.blit(self.time_surface, (0,0))
+        self.surface.blit(self.freq_surface, (0,540))
+
+        self.controls.draw(self.stream.sample_rate,
+                           self.stream.sample_size,
+                           self.gain)
+
+        pygame.display.flip()
 
 if __name__ == '__main__':
-    pygame.init()
-    stream.open()
-
+    waves = Waves()
     while True:
         try:
-            processEvents()
-            SURFACE.fill(BACKGROUND_COLOR)
-            controls.draw(stream.sample_rate, stream.sample_size, SMOOTHING, GAIN)
-            bytes = stream.read(stream.sample_size)
-            draw_bars(bytes, stream.sample_rate, stream.sample_size, SMOOTHING, GAIN)
-            pygame.display.flip()
-
+            waves.loop()
         except KeyboardInterrupt:
-            stream.close()
-            pygame.quit()
+            print('please close the window instead of using control-c!')
