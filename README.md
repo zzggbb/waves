@@ -1,29 +1,44 @@
 # W A V E S
-An FFT based Audio Visualizer
+Visualize audio in the frequency and time domain
 
-![purple.png](images/purple.png)
+![double.png](images/double.png)
+
+### Features
+* time and frequency domains are displayed
+* signal is smoothed over time
+* adjustable sampling rate, sample size, and gain
+* adjustable colors and gradients
+
+### Controls
+* h - halve sample size
+* l - double sample size
+* j - decrease sample rate
+* l - increase sample rate
+* t - increase gain
+* g - decrease gain
 
 ### Getting Started
+You will need python3 installed.
 
+Download the project and create a virtual environment:
 ```
 $ git clone https://github.com/zzggbb/waves
 $ cd waves
 $ python3 -m virtualenv .
+```
+
+Enter the virtual environment and install required packages:
+```
 $ source bin/activate
 $ pip install -r requirements.txt
 ```
 
-To run the visualizer:
+Run the visualizer:
 ```
 $ python3 waves.py
 ```
 
-To leave the virtual env:
+Leave the virtual env:
 ```
 $ deactivate
 ```
-
-### Features
-* adjustable sampling rate, sample size, gain, and smoothing
-* adjustable colors and gradients
-* view audio in the time or frequency domain
