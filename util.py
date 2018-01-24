@@ -1,13 +1,8 @@
-"""
-    utility.py
-    independent functions for use in waves.py
-"""
-
 import math
 
-def normalize(value, width):
-    offset = 2.0 ** (width - 1)
-    scale = (2.0 ** width) - 1
+def normalize(value):
+    offset = 2.0 ** 15
+    scale = (2.0 ** 16) - 1
     return (value + offset) / scale
 
 def gradient(ratio, color1, color2):
@@ -19,7 +14,7 @@ def gradient(ratio, color1, color2):
 def bias(b, x):
     return x ** (math.log(b)/math.log(0.5))
 
-def gain(g, x):
+def gain(x, g):
     if x < 0.5:
         return bias(1-g, 2 * x) / 2
     return 1 - bias(1-g, 2 - 2 * x) / 2
