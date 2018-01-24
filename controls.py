@@ -17,11 +17,10 @@ class Controls(object):
         self.surface = surface
         self.font = pygame.font.Font(FONT_PATH, FONT_SIZE)
 
-    def draw(self, sample_rate, sample_size, smoothing, gain):
+    def draw(self, sample_rate, sample_size, gain):
         params = {
             'sample rate': sample_rate,
             'sample size': sample_size,
-            'smoothing': smoothing,
             'gain': gain,
         }
         max_label_width = 0
