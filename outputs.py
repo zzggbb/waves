@@ -32,7 +32,7 @@ class Outputs(object):
         self.num_formats = len(self.formats)
 
         self.format_index = 9
-        self.divisor_index = 0
+        self.divisor_index = 1
 
     def _set_best_divisor(self, target_ratio):
         best_diff = float('inf')
