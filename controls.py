@@ -17,11 +17,16 @@ class Controls(object):
         self.surface = surface
         self.font = pygame.font.Font(FONT_PATH, FONT_SIZE)
 
-    def draw(self, sample_rate, sample_size, gain):
+    def draw(self, sample_rate, sample_size, gain, smooth, width, bars):
+
         params = {
-            'sample rate': sample_rate,
-            'sample size': sample_size,
-            'gain': gain,
+            'sample rate': str(sample_rate),
+            'sample size': str(sample_size),
+            'gain ratio (0-1)': '{0:.2f}'.format(gain),
+            'smoothing ratio (0-1)': '{0:.2f}'.format(smooth),
+            'window width': str(width),
+            'bar count': str(bars),
+            'bar width': str(width // bars)
         }
         max_label_width = 0
         for label in params.keys():
@@ -31,11 +36,10 @@ class Controls(object):
 
         i = 0
         for label, value in params.items():
-            item_text = label + '  ' + str(value)
+            item_text = label + '  ' + value
             item_width, item_height = self.font.size(item_text)
             label_width, _ = self.font.size(label)
             item_surface = self.font.render(item_text, FONT_ANTIALIAS, FONT_COLOR)
             pos = (max_label_width - label_width, i)
             self.surface.blit(item_surface, pos)
             i = i + item_height
-
