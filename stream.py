@@ -14,6 +14,7 @@ class Stream(object):
         self._channels = channels
         self._sample_rate = sample_rate
         self._sample_size = sample_size
+        self.open()
 
     def read(self, sample_size):
         return self._stream.read(sample_size)
