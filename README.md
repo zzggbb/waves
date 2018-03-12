@@ -1,7 +1,7 @@
 # W A V E S
 Visualize audio in the frequency and time domain
 
-![double.png](images/double.png)
+![waves.png](waves.png)
 
 ### Features
 * simultaneous display of time and frequency domain
