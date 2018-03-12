@@ -1,4 +1,5 @@
 import math
+import time
 
 def normalize(value):
     offset = 2.0 ** 15
@@ -18,3 +19,11 @@ def gain(x, g):
     if x < 0.5:
         return bias(1-g, 2 * x) / 2
     return 1 - bias(1-g, 2 - 2 * x) / 2
+
+def show_period(f):
+    def wrapper(self):
+        start = time.time()
+        f(self)
+        end = time.time()
+        print(end - start)
+    return wrapper
