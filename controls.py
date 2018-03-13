@@ -1,7 +1,7 @@
 import pygame
 
 FONT_SIZE = 18
-FONT_PATH = './terminus.ttf'
+FONT_PATH = './resources/terminus.ttf'
 FONT_COLOR = (255,255,255)
 FONT_ANTIALIAS = True
 CARD_WIDTH = 200
