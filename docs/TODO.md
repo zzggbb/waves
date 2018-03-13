@@ -1,5 +1,7 @@
 ### Overall
 * fix the lag when switching samples sizes by 'skipping' data frames
+* test compatibility with macOS and windows
+* add ability to change input device
 
 ### Frequency Output:
 * more/better frequency bin scaling methods, currently just elliptical
