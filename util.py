@@ -1,6 +1,14 @@
 import math
 import time
 
+# map value between a and b to ratio p
+def iscale(a, b, x):
+    return (x - a) / (b - a)
+
+# map ratio p to value between a and b
+def scale(a, b, p):
+    return a + (b - a) * p
+
 def normalize(value):
     offset = 2.0 ** 15
     scale = (2.0 ** 16) - 1
@@ -19,6 +27,17 @@ def gain(x, g):
     if x < 0.5:
         return bias(1-g, 2 * x) / 2
     return 1 - bias(1-g, 2 - 2 * x) / 2
+
+def shift_parabola(x, x_max, y_max):
+    return x**2 * (y_max - 1)/(x_max**2) + 1
+
+def shift_ellipse(x, x_max, y_max):
+    return -1 * math.sqrt(
+                (1 - (x**2)/(x_max**2)) * y_max**2
+            ) + y_max + 1
+
+def shift_linear(x, x_max, y_max):
+    return x * (y_max - 1)/x_max + 1
 
 def show_period(f):
     def wrapper(self):
