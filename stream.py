@@ -24,8 +24,7 @@ class Stream(object):
                                    channels=self._channels,
                                    rate=self._sample_rate,
                                    frames_per_buffer=self._sample_size,
-                                   input=True,
-                                   input_device_index=8)
+                                   input=True)
 
     def close(self):
         self._stream.close()
@@ -48,5 +47,5 @@ class Stream(object):
     @sample_size.setter
     def sample_size(self, sample_size):
         self._stream.close()
-        self._sample_size = sample_size
+        self._sample_size = int(sample_size)
         self.open()
