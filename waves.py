@@ -1,6 +1,7 @@
 #!/bin/env python3
 import sys
 import time
+import math
 import struct
 
 import numpy
@@ -18,7 +19,7 @@ class Waves(object):
 
         self.outputs = Outputs()
         self.stream = Stream(channels=1,
-                             sample_rate=44100,
+                             sample_rate=48000,
                              sample_size=2048)
         # visual params
         self.background_color = pygame.Color(50, 50, 50)
@@ -82,9 +83,10 @@ class Waves(object):
 
         x_max = self.num_bars - 1
         for x in range(self.num_bars):
-            y = self.shift_function(x, x_max, y_max)
+            y = util.log_scale(self.stream.sample_rate, x,
+                               self.num_bars, self.stream.sample_size)
             s = self.smooth_slider.value
-            power_i = yf[int(y)]
+            power_i = yf[math.ceil(y)]
             power_s = self.f_history[x]*s + power_i*(1-s)
             power = self.f_history[x] = power_s
             bar_height = power * height

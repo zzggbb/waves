@@ -46,3 +46,6 @@ def show_period(f):
         end = time.time()
         print(end - start)
     return wrapper
+
+def log_scale(rs, ib, nb, ns):
+    return ((ns-2) * (rs/2)**((ib+1)/(nb+1)))/rs
