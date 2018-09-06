@@ -1,12 +1,15 @@
+### BPM detection
+Assume the beat lies in BPM_RANGE, for example 20-250hz. For each sampling
+frame of size SAMPLE_SIZE, calcuate the average power of the frequencies in
+BPM_RANGE. Store the average power of each frame in BPM_POWERS.
+
 ### Overall
 * fix the lag when switching samples sizes by 'skipping' data frames
 * test compatibility with macOS and windows
 * add ability to change input device
 
 ### Frequency Output:
-* more/better frequency bin scaling methods, currently just elliptical
 * power scaling by maximum of each bin
-* frequency domain smoothing
 
 ### Spectrogram
 * control seconds per pixel: each pixel can represent between 1/(sample rate) and 1 second

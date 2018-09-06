@@ -9,25 +9,23 @@ Visualize audio in the frequency and time domain
 * on the fly adjustments of all parameters:
   * sample rate
   * sample size
-  * gain ratio
-  * smooth ratio
+  * pull ratio
+  * smoothing ratio
   * width and height of output window
   * number of bars displayed
-  * gradient start and stop colors
+  * start and stop colors of gradient
 
 ### Key Bindings
 * b - decrease number of displayed bars
 * B - increase number of displayed bars
-* g - decrease gain ratio
-* G - increase gain ratio
 * n - halve sample size
 * N - double sample size
 * r - decrease sample rate
 * R - increase sample rate
-* s - decrease smoothing ratio
-* S - increase smoothing ratio
 * w - decrease output window width
 * W - increase output window width
+* h - decrease output window height
+* H - increase output window height
 
 ### Getting Started
 You will need python3 installed.
@@ -47,7 +45,7 @@ $ pip install -r requirements.txt
 
 Run the visualizer:
 ```
-$ python3 waves.py
+$ python3 main.py
 ```
 
 Leave the virtual env:
